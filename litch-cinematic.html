@@ -1,0 +1,1291 @@
+<!DOCTYPE html>
+<html lang="mn">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LITCH — Learn by Teaching</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --black: #000000;
+      --white: #FFFFFF;
+      --gray: #888888;
+    }
+
+    html, body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: var(--black);
+      color: var(--white);
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+
+    /* Film Grain Overlay */
+    .film-grain {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 9999;
+      opacity: 0.05;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+      animation: grain 0.5s steps(10) infinite;
+    }
+
+    @keyframes grain {
+      0%, 100% { transform: translate(0, 0); }
+      10% { transform: translate(-5%, -10%); }
+      20% { transform: translate(-15%, 5%); }
+      30% { transform: translate(7%, -25%); }
+      40% { transform: translate(-5%, 25%); }
+      50% { transform: translate(-15%, 10%); }
+      60% { transform: translate(15%, 0%); }
+      70% { transform: translate(0%, 15%); }
+      80% { transform: translate(3%, 35%); }
+      90% { transform: translate(-10%, 10%); }
+    }
+
+    /* CRT Scanlines */
+    .scanlines {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 9998;
+      background: repeating-linear-gradient(
+        0deg,
+        rgba(0, 0, 0, 0.15),
+        rgba(0, 0, 0, 0.15) 1px,
+        transparent 1px,
+        transparent 2px
+      );
+      animation: scanlineMove 8s linear infinite;
+    }
+
+    @keyframes scanlineMove {
+      0% { background-position: 0 0; }
+      100% { background-position: 0 100px; }
+    }
+
+    /* VHS Distortion */
+    .vhs-distortion {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 9997;
+      opacity: 0;
+      background: linear-gradient(
+        transparent 0%,
+        rgba(255, 255, 255, 0.02) 50%,
+        transparent 100%
+      );
+      animation: vhsLine 3s infinite;
+    }
+
+    @keyframes vhsLine {
+      0% { top: -100%; opacity: 0; }
+      50% { opacity: 0.5; }
+      100% { top: 100%; opacity: 0; }
+    }
+
+    /* Header */
+    .header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      padding: 30px 50px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      z-index: 1000;
+      background: transparent;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      animation: logoGlitch 5s infinite;
+    }
+
+    .logo img {
+      height: 40px;
+      width: auto;
+      filter: brightness(0) invert(1);
+      animation: logoFlicker 4s infinite;
+    }
+
+    @keyframes logoFlicker {
+      0%, 92%, 100% { opacity: 1; filter: brightness(0) invert(1); }
+      93% { opacity: 0.8; filter: brightness(0) invert(1) blur(1px); }
+      94% { opacity: 1; filter: brightness(0) invert(1); }
+      95% { opacity: 0.6; filter: brightness(0) invert(1) blur(2px); }
+      96% { opacity: 1; filter: brightness(0) invert(1); }
+    }
+
+    @keyframes logoGlitch {
+      0%, 90%, 100% { transform: translate(0); }
+      91% { transform: translate(-2px); }
+      92% { transform: translate(2px); }
+      93% { transform: translate(0); }
+    }
+
+    .system-status {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 12px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      opacity: 0.7;
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      background: var(--white);
+      border-radius: 50%;
+      animation: blink 1s infinite;
+    }
+
+    @keyframes blink {
+      0%, 50% { opacity: 1; }
+      51%, 100% { opacity: 0.3; }
+    }
+
+    .header-line {
+      position: absolute;
+      bottom: 0;
+      left: 50px;
+      right: 50px;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--white), transparent);
+      animation: linePulse 2s infinite;
+    }
+
+    @keyframes linePulse {
+      0%, 100% { opacity: 0.3; }
+      50% { opacity: 0.8; }
+    }
+
+    /* Sections Container */
+    .sections-container {
+      width: 100%;
+      height: 100%;
+      position: relative;
+    }
+
+    .section {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 1.5s ease, visibility 1.5s ease;
+    }
+
+    .section.active {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    /* Section 1 - The Problem */
+    .section-1 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      grid-template-rows: 1fr;
+      gap: 80px;
+      padding: 100px 100px 60px;
+      align-items: center;
+      height: 100%;
+      overflow: hidden;
+    }
+
+    .section-1-text {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      max-width: 520px;
+      margin: 0 auto;
+      text-align: center;
+      justify-self: center;
+      gap: 28px;
+    }
+
+    .problem-text {
+      font-size: clamp(17px, 1.6vw, 24px);
+      font-weight: 400;
+      line-height: 1.85;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: all 1s ease;
+      text-align: center;
+      letter-spacing: 0.01em;
+    }
+
+    .problem-text.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .problem-text.dissolving {
+      animation: sparkleDissolve 1.5s forwards;
+    }
+
+    @keyframes sparkleDissolve {
+      0% { opacity: 1; transform: scale(1); filter: blur(0); }
+      50% { opacity: 0.5; transform: scale(1.02); filter: blur(2px); text-shadow: -3px 0 #fff, 3px 0 #fff, 0 -3px #fff, 0 3px #fff; }
+      100% { opacity: 0; transform: scale(0.98); filter: blur(5px); }
+    }
+
+    .video-container {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      align-self: center;
+      justify-self: center;
+      width: 100%;
+      height: 100%;
+    }
+
+    .video-frame {
+      position: relative;
+      display: inline-block;
+      overflow: hidden;
+      line-height: 0;
+      flex-shrink: 0;
+    }
+
+    .video-frame video {
+      display: block;
+      max-height: calc(100vh - 200px);
+      width: auto;
+      max-width: 100%;
+    }
+
+    /* Border perfectly hugs the video via pseudo-element */
+    .video-frame::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      pointer-events: none;
+      z-index: 20;
+    }
+
+    .video-overlay-scanlines {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 2px,
+        rgba(0, 0, 0, 0.3) 2px,
+        rgba(0, 0, 0, 0.3) 4px
+      );
+      animation: scanlineMove 4s linear infinite;
+      pointer-events: none;
+      z-index: 2;
+    }
+
+    .video-overlay-vhs {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(
+        transparent 0%,
+        rgba(255, 255, 255, 0.05) 50%,
+        transparent 100%
+      );
+      animation: vhsOverlay 2s infinite;
+      pointer-events: none;
+      z-index: 3;
+    }
+
+    @keyframes vhsOverlay {
+      0% { transform: translateY(-100%); }
+      100% { transform: translateY(100%); }
+    }
+
+    .video-vignette {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: radial-gradient(circle at center, transparent 40%, rgba(0, 0, 0, 0.8) 100%);
+      pointer-events: none;
+      z-index: 4;
+    }
+
+    .video-rgb-glitch {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      pointer-events: none;
+      z-index: 5;
+      opacity: 0;
+      mix-blend-mode: screen;
+    }
+
+    .video-rgb-glitch.active {
+      animation: rgbFlash 0.3s ease;
+    }
+
+    @keyframes rgbFlash {
+      0% { opacity: 0; background: transparent; }
+      25% { opacity: 0.5; background: rgba(255, 255, 255, 0.3); }
+      50% { opacity: 0; background: transparent; }
+      75% { opacity: 0.3; background: rgba(255, 255, 255, 0.2); }
+      100% { opacity: 0; background: transparent; }
+    }
+
+    .corner-marker {
+      position: absolute;
+      width: 20px;
+      height: 20px;
+      border: 2px solid var(--white);
+      z-index: 10;
+    }
+
+    .corner-marker.tl { top: 10px; left: 10px; border-right: none; border-bottom: none; }
+    .corner-marker.tr { top: 10px; right: 10px; border-left: none; border-bottom: none; }
+    .corner-marker.bl { bottom: 10px; left: 10px; border-right: none; border-top: none; }
+    .corner-marker.br { bottom: 10px; right: 10px; border-left: none; border-top: none; }
+
+    .video-label {
+      position: absolute;
+      font-size: 10px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      opacity: 0.7;
+      z-index: 10;
+    }
+
+    .video-label.top { top: 15px; left: 50%; transform: translateX(-50%); }
+    .video-label.bottom { bottom: 15px; right: 15px; display: flex; align-items: center; gap: 5px; }
+    .video-label .rec-dot { width: 8px; height: 8px; background: var(--white); border-radius: 50%; animation: recBlink 1s infinite; }
+
+    @keyframes recBlink {
+      0%, 50% { opacity: 1; }
+      51%, 100% { opacity: 0; }
+    }
+
+    .hud-frame {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      pointer-events: none;
+      z-index: 6;
+    }
+
+    .hud-frame::before,
+    .hud-frame::after {
+      content: '';
+      position: absolute;
+      background: rgba(255, 255, 255, 0.5);
+    }
+
+    .hud-frame::before {
+      top: 50%;
+      left: 0;
+      width: 10px;
+      height: 1px;
+    }
+
+    .hud-frame::after {
+      top: 50%;
+      right: 0;
+      width: 10px;
+      height: 1px;
+    }
+
+    /* Floating Code Fragments */
+    .code-fragments {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      pointer-events: none;
+    }
+
+    .code-fragment {
+      position: absolute;
+      font-family: monospace;
+      font-size: 10px;
+      opacity: 0.1;
+      white-space: nowrap;
+      animation: floatCode 20s linear infinite;
+    }
+
+    @keyframes floatCode {
+      0% { transform: translateY(100vh) rotate(0deg); opacity: 0; }
+      10% { opacity: 0.1; }
+      90% { opacity: 0.1; }
+      100% { transform: translateY(-100vh) rotate(360deg); opacity: 0; }
+    }
+
+    /* Section 2 - Insights */
+    .section-2 {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 80px 120px;
+      text-align: center;
+      height: 100vh;
+    }
+
+    /* Absolutely covers section so insight texts don't affect flex flow */
+    .insight-text-container {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+    }
+
+    /* Each text is independently centered on the screen */
+    .insight-text {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, calc(-50% + 40px));
+      width: 80%;
+      max-width: 800px;
+      font-size: clamp(17px, 1.9vw, 26px);
+      font-weight: 400;
+      line-height: 1.9;
+      opacity: 0;
+      transition: all 1.2s ease;
+      text-align: center;
+    }
+
+    .insight-text.visible {
+      opacity: 1;
+      transform: translate(-50%, -50%);
+    }
+
+    .insight-text.fading {
+      opacity: 0;
+      transform: translate(-50%, calc(-50% - 40px));
+      filter: blur(5px);
+    }
+
+    /* Cards section wrapper — the animated unit */
+    .cards-section {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 28px;
+      width: 90%;
+      max-width: 1040px;
+      opacity: 0;
+      transform: translateY(50px);
+      transition: all 1s ease;
+      margin: auto;
+    }
+
+    .cards-section.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .cards-intro-text {
+      font-size: clamp(14px, 1.3vw, 17px);
+      font-weight: 400;
+      line-height: 1.75;
+      text-align: center;
+      opacity: 0.75;
+      letter-spacing: 0.01em;
+      max-width: 700px;
+    }
+
+    /* Glitch Cards grid — no longer animates itself */
+    .glitch-cards {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+      width: 100%;
+    }
+
+    .glitch-card {
+      position: relative;
+      padding: 36px 28px;
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      background: rgba(255, 255, 255, 0.02);
+      transition: all 0.3s ease;
+      overflow: hidden;
+      text-align: center;
+    }
+
+    .glitch-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: url("data:image/svg+xml,%3Csvg viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.05'/%3E%3C/svg%3E");
+      pointer-events: none;
+    }
+
+    .glitch-card:hover {
+      border-color: rgba(255, 255, 255, 0.5);
+      transform: translateY(-5px);
+      box-shadow: -2px 0 rgba(255, 255, 255, 0.5), 2px 0 rgba(255, 255, 255, 0.5);
+    }
+
+    .glitch-card h3 {
+      font-size: 16px;
+      font-weight: 700;
+      margin-bottom: 16px;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      text-align: center;
+    }
+
+    .glitch-card p {
+      font-size: 14px;
+      line-height: 1.75;
+      opacity: 0.75;
+      text-align: center;
+    }
+
+    /* Background Silhouettes — hidden */
+    .silhouettes {
+      display: none;
+    }
+
+    /* Section 3 - Solution */
+    .section-3 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 60px;
+      padding: 120px 80px 80px;
+      align-items: center;
+    }
+
+    /* Gallery — one image at a time, fully visible */
+    .image-gallery {
+      position: relative;
+      height: calc(100vh - 160px);
+      overflow: hidden;
+      border: 1px solid rgba(255,255,255,0.12);
+    }
+
+    .gallery-item {
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      transition: opacity 1s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .gallery-item.active {
+      opacity: 1;
+    }
+
+    .gallery-item img {
+      display: block;
+      max-width: 100%;
+      max-height: 100%;
+      width: auto;
+      height: auto;
+      object-fit: contain;
+    }
+
+    /* Scanline overlay on each image */
+    .gallery-overlay {
+      position: absolute;
+      inset: 0;
+      background: repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 3px,
+        rgba(0, 0, 0, 0.08) 3px,
+        rgba(0, 0, 0, 0.08) 6px
+      );
+      pointer-events: none;
+      z-index: 3;
+      animation: scanlineMove 6s linear infinite;
+    }
+
+    .gallery-counter {
+      position: absolute;
+      bottom: 16px;
+      right: 20px;
+      font-size: 11px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      opacity: 0.5;
+      z-index: 10;
+    }
+
+    .section-3-text {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+      text-align: center;
+    }
+
+    /* Each solution text is independently centered in the column */
+    .solution-text {
+      position: absolute;
+      top: 50%;
+      left: 0;
+      right: 0;
+      transform: translateY(calc(-50% + 20px));
+      padding: 0 20px;
+      font-size: clamp(16px, 1.7vw, 22px);
+      font-weight: 400;
+      line-height: 1.9;
+      opacity: 0;
+      transition: all 1s ease;
+      text-align: center;
+    }
+
+    .solution-text.visible {
+      opacity: 1;
+      transform: translateY(-50%);
+    }
+
+    .solution-text.hidden {
+      opacity: 0;
+      transform: translateY(calc(-50% - 20px));
+    }
+
+    /* Final Logo */
+    .final-screen {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: var(--black);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      visibility: hidden;
+      z-index: 2000;
+      transition: all 2s ease;
+    }
+
+    .final-screen.active {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .final-logo {
+      animation: finalGlitch 3s infinite;
+    }
+
+    .final-logo img {
+      height: clamp(80px, 15vw, 180px);
+      width: auto;
+      filter: brightness(0) invert(1);
+    }
+
+    @keyframes finalGlitch {
+      0%, 85%, 100% { filter: brightness(0) invert(1) drop-shadow(0 0 30px rgba(255, 255, 255, 0.3)); transform: translate(0); }
+      86% { filter: brightness(0) invert(1) drop-shadow(-5px 0 #fff) drop-shadow(5px 0 #fff); transform: translate(-3px); }
+      88% { filter: brightness(0) invert(1) drop-shadow(5px 0 #fff) drop-shadow(-5px 0 #fff); transform: translate(3px); }
+      90% { filter: brightness(0) invert(1) drop-shadow(0 0 30px rgba(255, 255, 255, 0.3)); transform: translate(0); }
+    }
+
+    .final-subtitle {
+      font-size: clamp(14px, 1.6vw, 20px);
+      font-weight: 300;
+      letter-spacing: 6px;
+      text-transform: uppercase;
+      margin-top: 24px;
+      opacity: 0;
+      text-align: center;
+      animation: fadeInUp 1.5s ease 0.5s forwards;
+    }
+
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 0.8; transform: translateY(0); }
+    }
+
+    .final-cursor {
+      width: 2px;
+      height: 30px;
+      background: var(--white);
+      margin-top: 50px;
+      animation: cursorBlink 0.8s infinite;
+    }
+
+    @keyframes cursorBlink {
+      0%, 50% { opacity: 1; }
+      51%, 100% { opacity: 0; }
+    }
+
+    /* Particles */
+    .particles {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 100;
+    }
+
+    .particle {
+      position: absolute;
+      width: 2px;
+      height: 2px;
+      background: var(--white);
+      border-radius: 50%;
+      opacity: 0;
+      animation: particleFloat 10s linear infinite;
+    }
+
+    @keyframes particleFloat {
+      0% { opacity: 0; transform: translateY(100vh) scale(0); }
+      10% { opacity: 0.5; }
+      90% { opacity: 0.5; }
+      100% { opacity: 0; transform: translateY(-100px) scale(1); }
+    }
+
+    /* Cursor Glow */
+    .cursor-glow {
+      position: fixed;
+      width: 200px;
+      height: 200px;
+      background: radial-gradient(circle, rgba(255, 255, 255, 0.05) 0%, transparent 70%);
+      border-radius: 50%;
+      pointer-events: none;
+      transform: translate(-50%, -50%);
+      z-index: 9996;
+      transition: opacity 0.3s ease;
+    }
+
+    /* White Flash */
+    .white-flash {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: var(--white);
+      opacity: 0;
+      pointer-events: none;
+      z-index: 10000;
+      transition: opacity 0.1s ease;
+    }
+
+    .white-flash.active {
+      opacity: 1;
+    }
+
+    /* Light Flicker */
+    .light-flicker {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: transparent;
+      pointer-events: none;
+      z-index: 9995;
+      animation: lightFlicker 8s infinite;
+    }
+
+    @keyframes lightFlicker {
+      0%, 100% { background: transparent; }
+      5% { background: rgba(255, 255, 255, 0.02); }
+      5.5% { background: transparent; }
+      10% { background: rgba(255, 255, 255, 0.01); }
+      10.2% { background: transparent; }
+      50% { background: transparent; }
+      50.5% { background: rgba(255, 255, 255, 0.03); }
+      51% { background: transparent; }
+    }
+
+    /* Responsive */
+    @media (max-width: 1024px) {
+      .section-1 {
+        grid-template-columns: 1fr;
+        padding: 100px 40px 40px;
+        gap: 40px;
+      }
+      .section-3 {
+        grid-template-columns: 1fr;
+        padding: 100px 40px 40px;
+        gap: 40px;
+      }
+      .glitch-cards {
+        grid-template-columns: 1fr;
+      }
+      .video-container {
+        order: -1;
+        width: 100%;
+        max-width: 480px;
+        margin: 0 auto;
+      }
+      .section-3-text {
+        padding: 0;
+      }
+      .image-gallery {
+        height: 300px;
+      }
+    }
+
+    /* Space hint */
+    .restart-hint {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      font-size: 11px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      opacity: 0.4;
+      z-index: 9999;
+    }
+
+    /* Intro screen — logo on full black */
+    #introScreen {
+      position: fixed;
+      inset: 0;
+      background: #000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 5000;
+      transition: opacity 1.5s ease, visibility 1.5s ease;
+    }
+
+    #introScreen.hidden {
+      opacity: 0;
+      visibility: hidden;
+    }
+
+    #introScreen img {
+      max-width: 55vw;
+      max-height: 80vh;
+      width: auto;
+      height: auto;
+    }
+
+    /* Question / Answer full-screen sections */
+    .section-qa {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 80px 120px;
+    }
+
+    .qa-text {
+      font-size: clamp(26px, 3.5vw, 52px);
+      font-weight: 700;
+      text-align: center;
+      letter-spacing: 0.02em;
+      line-height: 1.35;
+      max-width: 900px;
+      opacity: 0;
+      transform: translateY(30px);
+      transition: all 1.2s ease;
+    }
+
+    .qa-text.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  </style>
+</head>
+<body>
+  <!-- Overlays -->
+  <div class="film-grain"></div>
+  <div class="scanlines"></div>
+  <div class="vhs-distortion"></div>
+  <div class="light-flicker"></div>
+  <div class="cursor-glow" id="cursorGlow"></div>
+  <div class="white-flash" id="whiteFlash"></div>
+
+  <!-- Particles -->
+  <div class="particles" id="particles"></div>
+
+  <!-- Intro Screen — logo shown first -->
+  <div id="introScreen">
+    <img src="logo-bird.png" alt="Logo">
+  </div>
+
+  <!-- Header -->
+  <header class="header">
+    <div class="logo">
+      <img src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/logo-hB2N6BP69B2OBwl4hO31AdFx1VlU7z.png" alt="LITCH">
+    </div>
+    <div class="system-status">
+      <div class="status-dot"></div>
+      <span>SYSTEM ACTIVE</span>
+    </div>
+    <div class="header-line"></div>
+  </header>
+
+  <!-- Sections -->
+  <div class="sections-container">
+    <!-- Section 1: The Problem -->
+    <section class="section section-1 active" id="section1">
+      <div class="code-fragments" id="codeFragments"></div>
+      <div class="section-1-text">
+        <p class="problem-text" id="problemText1">Өнөөдөр дэлхий дээр хамгийн их алдагдаж байгаа зүйл бол мөнгө биш, бидний soft skill юм.</p>
+        <p class="problem-text" id="problemText2">Сошиал медиа болон хиймэл оюун ухаан хөгжсөн энэ цаг үед бидний хүнтэй харилцах чадвар, академик ур чадвар, өөртөө итгэх итгэл болон хүсэл тэмүүлэл, зорилго бага багаар үгүй болж байна.</p>
+      </div>
+      <div class="video-container">
+        <div class="video-frame">
+          <video id="mainVideo" autoplay muted playsinline>
+            <source src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/video-dDT4glicsvJWi0wYcZmwtgjLwhhdxs.mp4" type="video/mp4">
+          </video>
+          <div class="video-overlay-scanlines"></div>
+          <div class="video-overlay-vhs"></div>
+          <div class="video-vignette"></div>
+          <div class="video-rgb-glitch" id="videoRgbGlitch"></div>
+          <div class="hud-frame"></div>
+          <div class="corner-marker tl"></div>
+          <div class="corner-marker tr"></div>
+          <div class="corner-marker bl"></div>
+          <div class="corner-marker br"></div>
+          <div class="video-label top">CLASSIFIED</div>
+          <div class="video-label bottom"><span class="rec-dot"></span>REC</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section 2: Insights -->
+    <section class="section section-2" id="section2">
+      <div class="silhouettes" id="silhouettes"></div>
+      <div class="insight-text-container">
+        <p class="insight-text" id="insightText1">Бид монголын болон гадаадын их дээд сургуулийн оюутнуудын дунд судалгаа хийхэд, ихэнх нь чөлөөт цагаа social media scrolling, short video үзэх, эсвэл зорилгогүй интернет хэрэглээнд зарцуулж байна.</p>
+        <p class="insight-text" id="insightText2">Гэхдээ хамгийн сонирхолтой нь — тэд залхуудаа биш. Тэдэнд зүгээр л өөрийгөө хөгжүүлэх зөв орчин байдаггүй.</p>
+      </div>
+      <div class="cards-section" id="cardsSection">
+        <p class="cards-intro-text">Мөн судалгааны үр дүнд оюутнуудад тулгарч буй дараах асуудлуудыг тодорхойлсон. Үүнд:</p>
+        <div class="glitch-cards" id="glitchCards">
+          <div class="glitch-card">
+            <h3>Академик чадварын уналт</h3>
+            <p>Хиймэл оюун ухаанд хэт найдах нь бие даан сэтгэх, асуудлыг шийдвэрлэх чадварыг сулруулж байна.</p>
+          </div>
+          <div class="glitch-card">
+            <h3>Сэтгэл зүйн дарамт</h3>
+            <p>Сошиал медиа дахь хиймэл амжилттай өөрийгөө харьцуулах нь сэтгэл ханамжийг бууруулдаг.</p>
+          </div>
+          <div class="glitch-card">
+            <h3>Дотоод хүсэл эрмэлзэлгүй болох</h3>
+            <p>Бэлэн мэдээлэл, хялбар хариултад дассанаар хувь хүний өсөж хөгжих хүсэл, идэвх зүтгэл бага багаар алдагдаж байна.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section Q: Question -->
+    <section class="section section-qa" id="sectionQuestion">
+      <p class="qa-text" id="questionText">Тэгвэл энэ асуудлын гаргалгаа юу вэ?</p>
+    </section>
+
+    <!-- Section A: Answer -->
+    <section class="section section-qa" id="sectionAnswer">
+      <p class="qa-text" id="answerText">Бидний шийдэл: Litch</p>
+    </section>
+
+    <!-- Section 3: Solution -->
+    <section class="section section-3" id="section3">
+      <div class="image-gallery" id="imageGallery">
+        <div class="gallery-item" id="gi0" data-number="01"><img src="1.jpg" alt=""><div class="gallery-overlay"></div></div>
+        <div class="gallery-item" id="gi1" data-number="02"><img src="2.jpg" alt=""><div class="gallery-overlay"></div></div>
+        <div class="gallery-item" id="gi2" data-number="03"><img src="3.jpg" alt=""><div class="gallery-overlay"></div></div>
+        <div class="gallery-item" id="gi3" data-number="04"><img src="4.jpg" alt=""><div class="gallery-overlay"></div></div>
+        <div class="gallery-item" id="gi4" data-number="05"><img src="5.jpg" alt=""><div class="gallery-overlay"></div></div>
+        <div class="gallery-item" id="gi5" data-number="06"><img src="6.jpg" alt=""><div class="gallery-overlay"></div></div>
+        <div class="gallery-counter" id="galleryCounter">01 / 06</div>
+      </div>
+      <div class="section-3-text">
+        <p class="solution-text" id="solText2">Litch бол оюутнууд мэдлэгээ мөнгөөр биш, харилцан туршлагаар солилцдог платформ юм.</p>
+        <p class="solution-text" id="solText3">Код бичдэг оюутан дизайн сурна. Дизайн хийдэг оюутан код бичиж сурна.</p>
+        <p class="solution-text" id="solText4">Нэг нь заана, нөгөө нь сурна. Улмаар тэд хамтдаа өсөж хөгжнө.</p>
+        <p class="solution-text" id="solText5">Энд зөвхөн мэргэжлийн ур чадвар бус, харилцаа, манлайлал, багаар ажиллах чадвар болон өөртөө итгэх итгэл давхар хөгждөг.</p>
+        <p class="solution-text" id="solText6">Учир нь хүн бусдад заах үедээ өөрөө хамгийн их хөгждөг.</p>
+        <p class="solution-text" id="solText7">Бид 'doomscrolling'-ийг буюу цахим орчинд утгагүй цаг үрэх үйлдлийг 'growth scrolling' буюу өсөж хөгжих боломж болгон өөрчлөхийг хүсэж байна.</p>
+        <p class="solution-text" id="solText8">Цагийг зүгээр л өнгөрөөдөг биш, ирээдүйгээ хамтдаа бүтээдэг платформыг бий болгоно.</p>
+      </div>
+    </section>
+  </div>
+
+  <!-- Final Screen -->
+  <div class="final-screen" id="finalScreen">
+    <div class="final-logo">
+      <img src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/logo-hB2N6BP69B2OBwl4hO31AdFx1VlU7z.png" alt="LITCH">
+    </div>
+    <div class="final-subtitle">Learn by Teaching.</div>
+    <div class="final-cursor"></div>
+  </div>
+
+
+  <script>
+    // Initialize particles
+    function createParticles() {
+      const container = document.getElementById('particles');
+      for (let i = 0; i < 50; i++) {
+        const particle = document.createElement('div');
+        particle.className = 'particle';
+        particle.style.left = Math.random() * 100 + '%';
+        particle.style.animationDelay = Math.random() * 10 + 's';
+        particle.style.animationDuration = (Math.random() * 10 + 8) + 's';
+        container.appendChild(particle);
+      }
+    }
+
+    // Initialize gallery particles
+    function createGalleryParticles() {
+      const container = document.getElementById('galleryParticles');
+      for (let i = 0; i < 20; i++) {
+        const particle = document.createElement('div');
+        particle.className = 'gallery-particle';
+        particle.style.left = Math.random() * 100 + '%';
+        particle.style.animationDelay = Math.random() * 8 + 's';
+        particle.style.animationDuration = (Math.random() * 6 + 6) + 's';
+        container.appendChild(particle);
+      }
+    }
+
+    // Initialize code fragments
+    function createCodeFragments() {
+      const container = document.getElementById('codeFragments');
+      const codes = [
+        'const learn = () => teach();',
+        'function growth() { return skill++; }',
+        'while(learning) { improve(); }',
+        'export default Knowledge;',
+        'import { wisdom } from "experience";',
+        '<Student mentor={true} />',
+        'class Teacher extends Learner {}',
+        'async function collaborate() {}',
+        '// Learn by teaching',
+        'return community.grow();'
+      ];
+
+      for (let i = 0; i < 15; i++) {
+        const fragment = document.createElement('div');
+        fragment.className = 'code-fragment';
+        fragment.textContent = codes[Math.floor(Math.random() * codes.length)];
+        fragment.style.left = Math.random() * 100 + '%';
+        fragment.style.animationDelay = Math.random() * 20 + 's';
+        fragment.style.animationDuration = (Math.random() * 15 + 15) + 's';
+        container.appendChild(fragment);
+      }
+    }
+
+    // Cursor glow
+    document.addEventListener('mousemove', function(e) {
+      var glow = document.getElementById('cursorGlow');
+      glow.style.left = e.clientX + 'px';
+      glow.style.top = e.clientY + 'px';
+    });
+
+    function triggerRgbGlitch() {
+      var glitch = document.getElementById('videoRgbGlitch');
+      glitch.classList.add('active');
+      setTimeout(function() { glitch.classList.remove('active'); }, 300);
+    }
+
+    function triggerWhiteFlash() {
+      var flash = document.getElementById('whiteFlash');
+      flash.classList.add('active');
+      setTimeout(function() { flash.classList.remove('active'); }, 150);
+    }
+
+    // ── State machine ──────────────────────────────────────
+    var stateIndex = 0;
+    var currentGalleryIndex = -1;
+    var currentSolIndex = -1;
+    var solTextIds = ['solText2','solText3','solText4','solText5','solText6','solText7','solText8'];
+
+    function sectionTransition(fromId, toId) {
+      triggerWhiteFlash();
+      if (fromId) document.getElementById(fromId).classList.remove('active');
+      setTimeout(function() {
+        if (toId) document.getElementById(toId).classList.add('active');
+      }, 200);
+    }
+
+    function showGalleryImage(idx) {
+      if (currentGalleryIndex >= 0)
+        document.getElementById('gi' + currentGalleryIndex).classList.remove('active');
+      document.getElementById('gi' + idx).classList.add('active');
+      currentGalleryIndex = idx;
+      document.getElementById('galleryCounter').textContent =
+        ('0' + (idx + 1)).slice(-2) + ' / 06';
+    }
+
+    function showSolText(idx) {
+      if (currentSolIndex >= 0) {
+        var prev = document.getElementById(solTextIds[currentSolIndex]);
+        if (prev) { prev.classList.remove('visible'); prev.classList.add('hidden'); }
+      }
+      var curr = document.getElementById(solTextIds[idx]);
+      if (curr) { curr.classList.add('visible'); triggerRgbGlitch(); }
+      currentSolIndex = idx;
+    }
+
+    function runState(s) {
+      switch (s) {
+        case 0: break; // waiting on intro screen
+
+        case 1: // Intro → Section 1 + text 1 зэрэг
+          document.getElementById('introScreen').classList.add('hidden');
+          setTimeout(function() {
+            document.getElementById('section1').classList.add('active');
+            var v = document.getElementById('mainVideo');
+            v.currentTime = 0; v.play();
+            setTimeout(function() {
+              document.getElementById('problemText1').classList.add('visible');
+              triggerRgbGlitch();
+            }, 300);
+          }, 800);
+          break;
+
+        case 2: // Text 2
+          document.getElementById('problemText2').classList.add('visible');
+          triggerRgbGlitch();
+          break;
+
+        case 3: // → Section 2 + insight 1
+          sectionTransition('section1', 'section2');
+          setTimeout(function() {
+            document.getElementById('insightText1').classList.add('visible');
+          }, 700);
+          break;
+
+        case 4: // Insight 2
+          document.getElementById('insightText1').classList.add('fading');
+          document.getElementById('insightText1').classList.remove('visible');
+          setTimeout(function() {
+            document.getElementById('insightText2').classList.add('visible');
+          }, 600);
+          break;
+
+        case 5: // Cards
+          document.getElementById('insightText2').classList.add('fading');
+          document.getElementById('insightText2').classList.remove('visible');
+          setTimeout(function() {
+            document.getElementById('cardsSection').classList.add('visible');
+          }, 600);
+          break;
+
+        case 6: // → Question section
+          sectionTransition('section2', 'sectionQuestion');
+          setTimeout(function() {
+            document.getElementById('questionText').classList.add('visible');
+          }, 700);
+          break;
+
+        case 7: // → Answer section
+          sectionTransition('sectionQuestion', 'sectionAnswer');
+          setTimeout(function() {
+            document.getElementById('answerText').classList.add('visible');
+          }, 700);
+          break;
+
+        case 8: // → Section 3, image 1, sol text 1
+          sectionTransition('sectionAnswer', 'section3');
+          setTimeout(function() {
+            showGalleryImage(0);
+            showSolText(0);
+          }, 700);
+          break;
+
+        case 9: case 10: case 11: case 12: case 13: // images 2–6
+          showGalleryImage(s - 8);
+          showSolText(s - 8);
+          break;
+
+        case 14: // last text, image 6 stays
+          showSolText(6);
+          break;
+
+        case 15: // Final screen
+          sectionTransition('section3', null);
+          setTimeout(function() {
+            document.getElementById('finalScreen').classList.add('active');
+          }, 500);
+          break;
+      }
+    }
+
+    function advance() {
+      if (stateIndex > 15) return;
+      runState(stateIndex);
+      stateIndex++;
+    }
+
+    function restart() {
+      stateIndex = 0;
+      currentGalleryIndex = -1;
+      currentSolIndex = -1;
+
+      document.getElementById('introScreen').classList.remove('hidden');
+      document.querySelectorAll('.section').forEach(function(s) { s.classList.remove('active'); });
+      document.getElementById('finalScreen').classList.remove('active');
+      document.querySelectorAll('.problem-text,.insight-text,.solution-text,.qa-text').forEach(function(t) {
+        t.classList.remove('visible','fading','hidden','dissolving');
+      });
+      document.getElementById('cardsSection').classList.remove('visible');
+      document.querySelectorAll('.gallery-item').forEach(function(g) { g.classList.remove('active'); });
+      document.getElementById('galleryCounter').textContent = '01 / 06';
+      var v = document.getElementById('mainVideo');
+      v.pause(); v.currentTime = 0;
+    }
+
+    document.addEventListener('keydown', function(e) {
+      if (e.key === ' ' || e.key === 'ArrowRight' || e.key === 'Enter') {
+        e.preventDefault();
+        advance();
+      }
+      if (e.key === 'r' || e.key === 'R') restart();
+    });
+
+    // Init
+    createParticles();
+    createCodeFragments();
+  </script>
+</body>
+</html>
